@@ -2,7 +2,7 @@
 DELETE http://localhost:3000/users/440162
 
 ### GET request to retrieve one user 
-GET http://localhost:3000/users/501335
+GET http://localhost:3000/users/1
 
 
 ### PUT REQUEST TO UPDATE AN EXISTING USER
@@ -13,7 +13,7 @@ Content-Type: application/json
     "user_id": 922012,
     "username": "Yolo", 
     "password": "mynameyolo",
-    "first_name": "Yummy Lee",
+    "first_name": "Yummy",
     "last_name": "Black", 
     "email": "yummy_reahme@gmail.com",
     "phone": "9059821122", 

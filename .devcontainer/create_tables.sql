@@ -1,59 +1,40 @@
 -- DROP TABLES
-
-DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS shoppingCart CASCADE;
+DROP TABLE IF EXISTS shopping_cart CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
-
--- CREATE TABLES ========================================
+DROP TABLE IF EXISTS users CASCADE;
 
 -- Create users table 
 CREATE TABLE users (
-    user_id INT PRIMARY KEY,
-    username VARCHAR(500),
-	password VARCHAR(500),
-	first_name VARCHAR(500),
-	last_name VARCHAR(500),
-    email VARCHAR(500),
+    user_id SERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(500) NOT NULL,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    email VARCHAR(255) UNIQUE NOT NULL,
     phone VARCHAR(50),
-    address VARCHAR (500)
+    address VARCHAR(500)
 );
 
 -- Create shopping cart table
 CREATE TABLE shopping_cart (
-	cart_id INT PRIMARY KEY,
-	cart_details VARCHAR(50),
+    cart_id SERIAL PRIMARY KEY,
+    cart_details VARCHAR(500),
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL
 );
 
--- Add foreign key to shopping cart table
-ALTER TABLE shopping_cart
-ADD FOREIGN KEY (user_id)
-REFERENCES orders (user_id)
-ON DELETE SET NULL;
-
--- Create product table
+-- Create products table
 CREATE TABLE products (
-	product_id INT PRIMARY KEY,
-	product_name VARCHAR(20),
-	product_description VARCHAR(20),
-	product_price VARCHAR(20)
+    product_id SERIAL PRIMARY KEY,
+    product_name VARCHAR(255) NOT NULL,
+    product_description TEXT,
+    product_price DECIMAL(10,2) NOT NULL
 );
-
--- Add foreign key to product table
-ALTER TABLE products
-ADD FOREIGN KEY (order_item_id)
-REFERENCES order_items (order_item_id)
-ON DELETE SET NULL;
 
 -- Create orders table
 CREATE TABLE orders (
-	order_id INT PRIMARY KEY,
-	order_date VARCHAR(20),
-	order_time VARCHAR(20), 
+    order_id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(user_id) ON DELETE SET NULL,
+    order_date DATE NOT NULL,
+    order_time TIME NOT NULL
 );
-
--- Add foreign key to orders table
-ALTER TABLE orders
-ADD FOREIGN KEY (user_id)
-REFERENCES shopping_cart (user_id)
-ON DELETE SET NULL;
