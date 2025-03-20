@@ -7,15 +7,21 @@ app.use(express.json());
 // Create a new user
 app.post('/users', async (req, res) => {
     const { username, password, first_name, last_name, email, phone, address } = req.body;
+    
+    // WARNING: This approach is vulnerable to SQL injection attacks!
+    // Using string interpolation directly in SQL queries is a security risk
     const query = `
         INSERT INTO users (username, password, first_name, last_name, email, phone, address)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        VALUES ('${username}', '${password}', '${first_name}', '${last_name}', '${email}', '${phone}', '${address}')
         RETURNING user_id;
-    `; // Ensure this query is correct and matches the database schema
+    `;
+    
     try {
-        const result = await db.query(query, [username, password, first_name, last_name, email, phone, address]);
+        // No parameters array needed with direct values in the query
+        const result = await db.query(query);
         res.status(201).json({ message: 'User created successfully', userId: result.rows[0].user_id });
     } catch (error) {
+        // Incase of an error during database operation, return a http status code 500
         res.status(500).json({ error: error.message });
     }
 });
@@ -53,7 +59,7 @@ app.delete('/users/:id', async (req, res) => {
     if (!Number.isInteger(parseInt(id))) {
         return res.status(400).json({ error: 'Invalid ID format' });
     }
-    const deleteUserSQL = 'DELETE FROM users WHERE user_id = $1';
+    const deleteUserSQL = 'DELETE FROM users WHERE user_id = $1 RETURNING *';
 
     try {
         const result = await db.query(deleteUserSQL, [id]);
@@ -64,7 +70,7 @@ app.delete('/users/:id', async (req, res) => {
         }
 
         // If deletion was successful
-        res.json({ message: 'User deleted' });
+        res.json({ message: 'User deleted', deletedUser: result.rows[0] });
     } catch (error) {
         console.error('Error deleting user:', error);
         res.status(500).json({ error: 'Internal Server error' });
